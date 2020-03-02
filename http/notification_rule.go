@@ -17,7 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// var _ influxdb.NotificationRuleStore = (*NotificationRuleService)(nil)
+var _ influxdb.NotificationRuleStore = (*NotificationRuleService)(nil)
 
 type statusDecode struct {
 	Status *influxdb.Status `json:"status"`
@@ -762,14 +762,14 @@ func NewNotificationRuleService(client *httpc.Client) *NotificationRuleService {
 	}
 }
 
-func (s *NotificationRuleService) CreateNotificationRule(ctx context.Context, nr influxdb.NotificationRuleCreate, userID influxdb.ID) (notificationRuleResponse, error) {
+func (s *NotificationRuleService) CreateNotificationRule(ctx context.Context, nr influxdb.NotificationRuleCreate, userID influxdb.ID) error {
 	var resp notificationRuleResponse
 	err := s.Client.
 		PostJSON(notificationRuleCreateEncoder{nrc: nr}, prefixNotificationRules).
 		DecodeJSON(&resp).
 		Do(ctx)
 
-	return resp, err
+	return err
 }
 
 type notificationRuleCreateEncoder struct {
@@ -826,15 +826,3 @@ func (s *NotificationRuleService) DeleteNotificationRule(ctx context.Context, id
 func getNotificationRulesIDPath(id influxdb.ID) string {
 	return path.Join(prefixNotificationRules, id.String())
 }
-
-// type notificationRuleEncoder struct {
-// 	nr   influxdb.NotificationRuleCreate
-// 	rule influxdb.NotificationRule
-// }
-
-// func (n *notificationRuleEncoder) MarshalJSON() ([]byte, error) {
-// 	b, err := json.Marshal(n.nr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// }
